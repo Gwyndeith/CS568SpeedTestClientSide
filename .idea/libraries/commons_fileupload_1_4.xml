@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="commons-fileupload-1.4">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../Apache Tomcat/Apache Libraries/commons-fileupload-1.4-bin (1)/commons-fileupload-1.4-bin/commons-fileupload-1.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
