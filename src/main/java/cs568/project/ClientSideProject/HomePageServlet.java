@@ -14,7 +14,7 @@ public class HomePageServlet extends HttpServlet {
     private long averagePing;
     private long averageDownloadSpeed;
     private long averageUploadSpeed;
-    final String awsMachineIpAddress = "ec2-18-192-37-43.eu-central-1.compute.amazonaws.com";
+    final String awsMachineIpAddress = "ec2-18-157-181-8.eu-central-1.compute.amazonaws.com";
     Socket socket;
     ObjectOutputStream oos;
     ObjectInputStream ois;
@@ -45,6 +45,7 @@ public class HomePageServlet extends HttpServlet {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        testProgress = 0;
         averagePing = runPingTest(oos, ois, awsMachineIpAddress, pingTestTrialTimes);
         averageDownloadSpeed = runDownloadTest(oos, ois, downloadTestTrialTimes);
         averageUploadSpeed = runUploadTest(oos, ois, uploadTestTrialTimes);
@@ -55,6 +56,12 @@ public class HomePageServlet extends HttpServlet {
 
         //Report the test results
         request.getRequestDispatcher("/testResults.jsp").forward(request, response);
+    }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().print(testProgress);
     }
 
     public void destroy() {

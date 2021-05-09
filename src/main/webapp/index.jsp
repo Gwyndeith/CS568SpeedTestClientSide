@@ -13,15 +13,19 @@
         text-align: center;
     }
 
-    /*
     .progress-div {
         text-align: center;
     }
 
     .progress-label {
+        font-size: 30px;
         font-weight: bold;
     }
-    */
+
+    .progress-bar {
+        height: 100px;
+        width: 300px;
+    }
 
     .section-title {
         text-align: center;
@@ -33,6 +37,17 @@
     .test-start-button {
         align-self: center;
         background-color: cornflowerblue;
+        border-radius: 8px;
+        height: 40px;
+        width: 200px;
+        box-sizing: border-box;
+        transition: all 0.2s;
+    }
+
+    .test-start-button:hover {
+        align-self: center;
+        background-color: darkcyan;
+        box-shadow: black;
         border-radius: 8px;
         height: 40px;
         width: 200px;
@@ -48,6 +63,25 @@
     <script type="text/javascript">
         function startSpeedTest() {
             window.location.href = "${pageContext.request.contextPath}/speed-test-servlet";
+
+            let pastTime = 0;
+            let progressUpdateVal = 0;
+            var progressUpdate = setInterval(
+                function() {
+                    if (progressUpdateVal !== 14) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '${pageContext.request.contextPath}/speed-test-servlet',
+                            data: '',
+                            success: function(response) {
+                                progressUpdateVal = parseInt(response.toString());
+                                document.getElementById('progressBar').value = progressUpdateVal;
+                            }
+                        })
+                    } else {
+                        clearInterval(progressUpdate);
+                    }
+                }, 100);
         }
     </script>
     <body>
@@ -57,12 +91,10 @@
             <button id="startSpeedTestButton" class="test-start-button" onclick="startSpeedTest()">Start Speed Test</button>
         </div>
         <br/>
-        <!--
         <div class="progress-div">
             <label class="progress-label">Test progress</label>
             <br/>
-            <progress id="progressBar" value="0" max="14"></progress>
+            <progress class="progress-bar" id="progressBar" value="0" max="14"></progress>
         </div>
-        -->
     </body>
 </html>

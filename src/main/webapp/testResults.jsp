@@ -32,6 +32,15 @@
       height: 40px;
       width: 200px;
     }
+
+    .test-start-button:hover {
+      align-self: center;
+      background-color: darkcyan;
+      box-shadow: black;
+      border-radius: 8px;
+      height: 40px;
+      width: 200px;
+    }
   </style>
   <script type="text/javascript">
     function returnToHome() {
