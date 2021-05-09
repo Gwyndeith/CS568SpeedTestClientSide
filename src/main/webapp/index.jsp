@@ -13,6 +13,7 @@
         text-align: center;
     }
 
+    /*
     .progress-div {
         text-align: center;
     }
@@ -20,6 +21,7 @@
     .progress-label {
         font-weight: bold;
     }
+    */
 
     .section-title {
         text-align: center;
@@ -55,10 +57,12 @@
             <button id="startSpeedTestButton" class="test-start-button" onclick="startSpeedTest()">Start Speed Test</button>
         </div>
         <br/>
+        <!--
         <div class="progress-div">
             <label class="progress-label">Test progress</label>
             <br/>
             <progress id="progressBar" value="0" max="14"></progress>
         </div>
+        -->
     </body>
 </html>
