@@ -14,10 +14,11 @@ public class HomePageServlet extends HttpServlet {
     private long averagePing;
     private long averageDownloadSpeed;
     private long averageUploadSpeed;
-    final String awsMachineIpAddress = "ec2-18-157-181-8.eu-central-1.compute.amazonaws.com";
+    final String awsMachineIpAddress = "ec2-52-59-90-223.eu-central-1.compute.amazonaws.com";
     Socket socket;
     ObjectOutputStream oos;
     ObjectInputStream ois;
+
     {
         try {
             socket = new Socket(awsMachineIpAddress, 9000);
@@ -27,6 +28,7 @@ public class HomePageServlet extends HttpServlet {
             e.printStackTrace();
         }
     }
+
     //To connect to a server running on localhost, Download speed on localhost will show 100 Mbps
 //        final String awsMachineIpAddress = "localhost";
     final int pingTestTrialTimes = 10;
@@ -46,9 +48,18 @@ public class HomePageServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         testProgress = 0;
-        averagePing = runPingTest(oos, ois, awsMachineIpAddress, pingTestTrialTimes);
+        if (socket.isClosed() || !socket.isConnected()) {
+            socket = new Socket(awsMachineIpAddress, 9000);
+            System.out.println(socket.getLocalSocketAddress());
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            ois = new ObjectInputStream(socket.getInputStream());
+            System.out.println("Server says: " + ois.readUTF());
+        }
+        averagePing = runPingTest(awsMachineIpAddress, pingTestTrialTimes);
         averageDownloadSpeed = runDownloadTest(oos, ois, downloadTestTrialTimes);
         averageUploadSpeed = runUploadTest(oos, ois, uploadTestTrialTimes);
+        sendCloseConnectionMessage(oos, ois);
+        socket.close();
 
         request.setAttribute("averagePing", averagePing);
         request.setAttribute("averageDownloadSpeed", averageDownloadSpeed);
@@ -68,7 +79,7 @@ public class HomePageServlet extends HttpServlet {
     }
 
     //Sends an ICMP ping to the given IP address to ping it, and calculates and returns the time it took to do that in ms as output to console.
-    public long runPingTest(ObjectOutputStream oos, ObjectInputStream ois, String awsMachineIpAddress, int pingTestTrialTimes) {
+    public long runPingTest(String awsMachineIpAddress, int pingTestTrialTimes) {
         long startTime = 0;
         long endTime = 0;
         boolean isPinged = false;
@@ -128,7 +139,7 @@ public class HomePageServlet extends HttpServlet {
                 long bps = (fileContent.length * 8L) / ((endTime - startTime) / 1000);
                 long Kbps = bps / 1024;
                 long Mbps = Kbps / 1024;
-                System.out.println("Current download speed(" + (i+1) + "/" + downloadTestTrialTimes + "): " + Mbps + " Mbps\n");
+                System.out.println("Current download speed(" + (i + 1) + "/" + downloadTestTrialTimes + "): " + Mbps + " Mbps\n");
                 averageSpeed += Mbps;
                 testProgress++;
             }
@@ -186,12 +197,17 @@ public class HomePageServlet extends HttpServlet {
             long Mbps = Kbps / 1024;
             averageSpeed += Mbps;
             testProgress++;
-            System.out.println("Current upload speed(" + (i+1) + "/" + uploadTestTrialTimes + "): " + Mbps + " Mbps\n");
+            System.out.println("Current upload speed(" + (i + 1) + "/" + uploadTestTrialTimes + "): " + Mbps + " Mbps\n");
             totalUploadTime += (endTime - startTime);
         }
         averageSpeed /= uploadTestTrialTimes;
         long averageUploadTime = totalUploadTime / uploadTestTrialTimes;
         System.out.println("Average data transfer time (upload): " + averageUploadTime + " ms\n");
         return averageSpeed;
+    }
+
+    public void sendCloseConnectionMessage(ObjectOutputStream oos, ObjectInputStream ois) throws IOException {
+        oos.writeUTF("closeConnection");
+        oos.flush();
     }
 }
